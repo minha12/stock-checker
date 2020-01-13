@@ -22,11 +22,9 @@ module.exports = function (app) {
       console.log('Stock: ' + stock)
       var like = req.query.like
       var ip = req.connection.remoteAddress
-      var like_count
+      //var like_count
       var result
-      if(like) {
-        like_count += 1
-      }
+      
       request(`https://repeated-alpaca.glitch.me/v1/stock/${stock}/quote`, (error, response, body) => {
         result = JSON.parse(body)
         if(result === 'Unknown symbol') {
