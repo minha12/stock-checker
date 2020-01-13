@@ -80,11 +80,15 @@ module.exports = function (app) {
       }
       
       if(Array.isArray(stock)){
-        var stockData1 = await stockHandler(stock[0], like, ip)
-        var stockData2 = stockHandler(stock[1], like, ip)
-        var resp =  [stockData1, stockData2 ]
-        console.log(resp)
-        res.json(resp)
+        var stockData1 =  stockHandler(stock[0], like, ip)
+          var stockData2 =  stockHandler(stock[1], like, ip)
+        ;(async () => {
+          
+          var resp = await [stockData1, stockData2 ]
+           await console.log(resp)
+           await res.json(resp)
+
+          })()
       }
       
       
