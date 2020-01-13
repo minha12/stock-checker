@@ -37,7 +37,7 @@ module.exports = function (app) {
             if(!like) {
               console.log('Connected to MongoDB')
               db.collection('Stocks').findAndModify(
-                {query: {stock: stock}},
+                {stock: stock},
                 {
                   $setOnInsert: {likes: []}
                 },
