@@ -21,7 +21,7 @@ module.exports = function (app) {
       request('https://repeated-alpaca.glitch.me/v1/stock/goog/quote', (error, response, body) => {
         var result = JSON.parse(body)
         console.log(result)
-        res.json(result)
+        res.json({stockData: {stock: result.symbol, price: result.latestPrice}})
       })
     });
     
