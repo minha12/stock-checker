@@ -35,14 +35,13 @@ module.exports = function (app) {
           MongoClient.connect(CONNECTION_STRING, (err, db) => {
             if(!like) {
               console.log('Connected to MongoDB')
-              db.collection('Stocks').findOne({stock: stock}, (err, doc) => {
-                if(!doc) {
-                  var stock_like = {stock: stock, likes: 0}
-                  db.collection('Stocks').insertOne(stock_like, (err, data) => {
-                    
-                  })
-                }
-
+              db.collection('Stocks').findAndModify({
+                query: {stock: stock},
+                update: {
+                  $setOnInsert: {likes: 0}
+                },
+                new: true,
+                upsert: true 
               })
             }
             
