@@ -21,6 +21,7 @@ module.exports = function (app) {
       var stock = req.query.stock
       console.log('Stock: ' + stock)
       var like = req.query.like
+      var ip = req.connection.remoteAddress
       var like_count
       var result
       if(like) {
@@ -35,14 +36,17 @@ module.exports = function (app) {
           MongoClient.connect(CONNECTION_STRING, (err, db) => {
             if(!like) {
               console.log('Connected to MongoDB')
-              db.collection('Stocks').findAndModify({
-                query: {stock: stock},
-                update: {
-                  $setOnInsert: {likes: 0}
+              db.collection('Stocks').findAndModify(
+                {query: {stock: stock}},
+                {
+                  $setOnInsert: {likes: []}
                 },
-                new: true,
-                upsert: true 
-              })
+                {new: true},
+                {upsert: true},
+                (error, data) => {
+                  console.log(data)
+                }
+              )
             }
             
             
