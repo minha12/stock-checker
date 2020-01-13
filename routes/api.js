@@ -28,7 +28,27 @@ module.exports = function (app) {
       }
       request(`https://repeated-alpaca.glitch.me/v1/stock/${stock}/quote`, (error, response, body) => {
         result = JSON.parse(body)
-        if(result === 'Unknown symbol') console.log('Bingo')
+        if(result === 'Unknown symbol') {
+          console.log('Unkown symbol')
+          res.send('Unkown symbol')
+        } else{
+          MongoClient.connect(CONNECTION_STRING, (err, db) => {
+            if(!like) {
+              console.log('Connected to MongoDB')
+              db.collection('Stocks').findOne({stock: stock}, (err, doc) => {
+                if(!doc) {
+                  var stock_like = {stock: stock, likes: 0}
+                  db.collection('Stocks').insertOne(stock_like, (err, data) => {
+                    
+                  })
+                }
+
+              })
+            }
+            
+            
+          })
+        }
         //res.json({stockData: {stock: result.symbol, price: result.latestPrice}})
         
       })
