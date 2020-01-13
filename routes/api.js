@@ -45,11 +45,28 @@ module.exports = function (app) {
                 },
                 (error, data) => {
                   console.log(data.value)
-                  res.json({stockData: {stock: result.symbol, price: result.latestPrice, likes: data.value.like.length}})
+                  res.json({stockData: {stock: result.symbol, price: result.latestPrice, likes: data.value.likes.length}})
                 }
               )
-            }else{
-              
+            }else{//update likes
+              db.collection('Stocks').findOneAndUpdate(
+              {stock: stock},
+              {
+                $addToSet: {likes: ip}
+              },
+              {
+                returnOriginal: false,
+                upsert: true
+              },
+              (error, data) => {
+                console.log(data)
+                res.json({
+                  stockData: 
+                    {stock: result.symbol, 
+                     price: result.latestPrice, 
+                     likes: data.value.likes.length
+                    }})
+              })
             }
             
             
