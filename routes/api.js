@@ -18,10 +18,10 @@ module.exports = function (app) {
 
   app.route('/api/stock-prices')
     .get(function (req, res){
-      request('https://repeated-alpaca.glitch.me/v1/stock/goog/quote', (err, res, body) => {
+      request('https://repeated-alpaca.glitch.me/v1/stock/goog/quote', (error, response, body) => {
         var result = JSON.parse(body)
         console.log(result)
-        res.json(result.latestPrice)
+        res.json(result)
       })
     });
     
