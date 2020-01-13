@@ -31,15 +31,16 @@ module.exports = function (app) {
           console.log('Unkown symbol')
           res.send('Unkown symbol')
         } else{
-          MongoClient.connect(CONNECTION_STRING, { useNewUrlParser: true, useUnifiedTopology: true }, (err, db) => {
+          MongoClient.connect(CONNECTION_STRING, (err, db) => {
             if(!like) {
               console.log('Connected to MongoDB')
               db.collection('Stocks').findAndModify(
                 {stock: stock},
+                {},
                 {
-                  $setOnInsert: {likes: []}
+                  $setOnInsert: {stock: stock, likes: []}
                 },
-                {new: true},
+                {returnOriginal: false},
                 {upsert: true},
                 (error, data) => {
                   console.log(data)
