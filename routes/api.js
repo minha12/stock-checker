@@ -31,7 +31,7 @@ module.exports = function (app) {
           console.log('Unkown symbol')
           res.send('Unkown symbol')
         } else{
-          MongoClient.connect(CONNECTION_STRING, (err, db) => {
+          MongoClient.connect(CONNECTION_STRING, { useNewUrlParser: true, useUnifiedTopology: true }, (err, db) => {
             if(!like) {
               console.log('Connected to MongoDB')
               db.collection('Stocks').findAndModify(
