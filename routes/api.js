@@ -32,20 +32,24 @@ module.exports = function (app) {
           res.send('Unkown symbol')
         } else{
           MongoClient.connect(CONNECTION_STRING, (err, db) => {
-            if(!like) {
+            if(!like) {//check if the stock is available in db, likes remain intact
               console.log('Connected to MongoDB')
-              db.collection('Stocks').findAndModify(
+              db.collection('Stocks').findOneAndUpdate(
                 {stock: stock},
-                {},
                 {
                   $setOnInsert: {stock: stock, likes: []}
                 },
-                {returnOriginal: false},
-                {upsert: true},
+                {
+                  returnOriginal: false,
+                  upsert: true
+                },
                 (error, data) => {
-                  console.log(data)
+                  console.log(data.value)
+                  res.json({stockData: {stock: result.symbol, price: result.latestPrice, likes: data.value.like.length}})
                 }
               )
+            }else{
+              
             }
             
             
