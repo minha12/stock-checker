@@ -26,12 +26,12 @@ module.exports = function (app) {
       
       
       
-      const stockHandler = (stock, like, ip) =>{
+      const stockHandler = (stock, like, ip, callback) =>{
         request(`https://repeated-alpaca.glitch.me/v1/stock/${stock}/quote`, (error, response, body) => {
         var result = JSON.parse(body)
         if(result === 'Unknown symbol') {
           console.log('Unkown symbol')
-          return 'Unkown symbol'
+          callback({stockData: 'Unkown symbol'})
         } else{
           MongoClient.connect(CONNECTION_STRING, (err, db) => {
             if(!like) {//check if the stock is available in db, likes remain intact
@@ -47,7 +47,7 @@ module.exports = function (app) {
                 },
                 (error, data) => {
                   console.log(data.value)
-                  return {stockData: {stock: result.symbol, price: result.latestPrice, likes: data.value.likes.length}}
+                  callback( {stockData: {stock: result.symbol, price: result.latestPrice, likes: data.value.likes.length}})
                 }
               )
             }else{//update likes
@@ -62,12 +62,12 @@ module.exports = function (app) {
               },
               (error, data) => {
                 console.log(data)
-                return {
+                callback({
                   stockData: 
                     {stock: result.symbol, 
                      price: result.latestPrice, 
                      likes: data.value.likes.length
-                    }}
+                    }})
               })
             }
             
@@ -78,17 +78,13 @@ module.exports = function (app) {
         
       })
       }
+      const callBack = (data) => {
+        res.json(data)
+      }
       
       if(Array.isArray(stock)){
-        var stockData1 =  stockHandler(stock[0], like, ip)
-          var stockData2 =  stockHandler(stock[1], like, ip)
-        ;(async () => {
-          
-          var resp = await [stockData1, stockData2 ]
-           await console.log(resp)
-           await res.json(resp)
-
-          })()
+        stockHandler(stock[0], like, ip, callBack)
+        stockHandler(stock[1], like, ip, callBack)
       }
       
       
