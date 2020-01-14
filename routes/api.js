@@ -46,7 +46,7 @@ module.exports = function (app) {
                   upsert: true
                 },
                 (error, data) => {
-                  console.log(data.value)
+                  //console.log(data.value)
                   callback( {stockData: {stock: result.symbol, price: result.latestPrice, likes: data.value.likes.length}})
                 }
               )
@@ -61,13 +61,8 @@ module.exports = function (app) {
                 upsert: true
               },
               (error, data) => {
-                console.log(data)
-                callback({
-                  stockData: 
-                    {stock: result.symbol, 
-                     price: result.latestPrice, 
-                     likes: data.value.likes.length
-                    }})
+                //console.log(data)
+                callback({ stockData: {stock: result.symbol, price: result.latestPrice, likes: data.value.likes.length }})
               })
             }
             
@@ -79,12 +74,13 @@ module.exports = function (app) {
       })
       }
       const callBack = (data) => {
-        res.json(data)
+        return data
       }
       
       if(Array.isArray(stock)){
-        stockHandler(stock[0], like, ip, callBack)
-        stockHandler(stock[1], like, ip, callBack)
+        var stock1 = stockHandler(stock[0], like, ip, callBack)
+        var stock2 = stockHandler(stock[1], like, ip, callBack)
+        console.log(stock1)
       }
       
       
