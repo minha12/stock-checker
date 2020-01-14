@@ -80,10 +80,27 @@ module.exports = function (app) {
       }
       
       if(Array.isArray(stock)){
-        var stock1 = stockHandler(stock[0], like, ip, callBack)
-        var stock2 = stockHandler(stock[1], like, ip, callBack)
-        console.log(stock1)
-        console.log(stock2)
+        var myPromise1 = new Promise((resolve, reject) => {
+          if(true) {
+            resolve(stockHandler(stock[0], like, ip, callBack))
+          } else{
+            reject('Something wrong')
+          }
+        })
+        var myPromise2 = new Promise((resolve, reject) => {
+          if(true) {
+            resolve(stockHandler(stock[1], like, ip, callBack))
+          } else{
+            reject('Something wrong')
+          }
+        })
+        Promise.all([promise1, promise2]).then(data =>{
+                                               console.log(data[0])
+          
+                                               })
+
+          
+ 
       }
       
       
