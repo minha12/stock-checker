@@ -76,10 +76,12 @@ module.exports = function (app) {
       })
       }
       const callBack = (data) => {
+        console.log(data)
         return data
       }
       
       if(Array.isArray(stock)){
+        console.log(stock[0])
         var myPromise1 = new Promise((resolve, reject) => {
           if(true) {
             resolve(stockHandler(stock[0], like, ip, callBack))
@@ -94,12 +96,18 @@ module.exports = function (app) {
             reject('Something wrong')
           }
         })
-        Promise.all([promise1, promise2]).then(data =>{
-                                               console.log(data[0])
-          
-                                               })
+        // Promise.all([myPromise1, myPromise2])
+        //   .then(data => {
+        //         console.log(data[0])
+        //         console.log(data[1])
+        //        })
 
-          
+        myPromise1.then(result => {
+          console.log(result)
+        })
+        myPromise2.then(result => {
+          console.log(result)
+        })
  
       }
       
