@@ -12,6 +12,7 @@ var expect = require('chai').expect;
 var MongoClient = require('mongodb');
 var request = require('request')
 
+
 const CONNECTION_STRING = process.env.DB; //MongoClient.connect(CONNECTION_STRING, function(err, db) {});
 
 module.exports = function (app) {
@@ -23,6 +24,7 @@ module.exports = function (app) {
       var like = req.query.like
       console.log(like)
       var ip = req.connection.remoteAddress
+      var appResponse
       
       
       
@@ -81,6 +83,7 @@ module.exports = function (app) {
         var stock1 = stockHandler(stock[0], like, ip, callBack)
         var stock2 = stockHandler(stock[1], like, ip, callBack)
         console.log(stock1)
+        console.log(stock2)
       }
       
       
