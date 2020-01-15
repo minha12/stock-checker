@@ -99,6 +99,15 @@ module.exports = function(app) {
         console.log(data[1]);
         stock1 = data[0]
         stock2 = data[1]
+        if(stock1.stockData === 'Unknown symbol' || stock2.stockData === 'Unkown symbol') {
+          const result = [stock1.stockData]
+          result.push(stock2.stockData)
+        } else{
+          const result = {
+          stockData: [{stock: stock1.stock, price: stock1.price, rel_likes: stock1.likes - stock2.likes},
+                      {stock: stock2.stock, price: stock2.price, rel_likes: stock2.likes - stock1.likes}]
+        }
+        }
         
         
       });
