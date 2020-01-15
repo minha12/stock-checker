@@ -119,6 +119,13 @@ module.exports = function(app) {
           res.json(result);
         }
       });
-    } //end of if Array
+    }else{//end of if Array
+      let stockData = stockHandler(stock, like, ip)
+      stockData.then(data => {
+        console.log(data)
+        res.json(data)
+      })
+      
+    } 
   }); //end of app.route --> .get
 };
