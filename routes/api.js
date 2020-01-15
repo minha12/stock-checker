@@ -21,7 +21,6 @@ module.exports = function(app) {
     var like = req.query.like;
     console.log(like);
     var ip = req.connection.remoteAddress;
-    var appResponse;
 
     const stockHandler = (stock, like, ip) => {
       return new Promise(waitForData => {
@@ -85,31 +84,40 @@ module.exports = function(app) {
                 }
               });
             }
-            //res.json({stockData: {stock: result.symbol, price: result.latestPrice}})
           }
         ); //end of request
       }); //end of Promise
     };
 
     if (Array.isArray(stock)) {
-      const stock1 = stockHandler(stock[0], like, ip);
-      const stock2 = stockHandler(stock[1], like, ip);
+      let stock1 = stockHandler(stock[0], like, ip);
+      let stock2 = stockHandler(stock[1], like, ip);
       Promise.all([stock1, stock2]).then(data => {
         console.log(data[0]);
         console.log(data[1]);
-        stock1 = data[0]
-        stock2 = data[1]
-        if(stock1.stockData === 'Unknown symbol' || stock2.stockData === 'Unkown symbol') {
-          const result = [stock1.stockData]
-          result.push(stock2.stockData)
-        } else{
+        stock1 = data[0].stockData;
+        stock2 = data[1].stockData;
+        if (stock1 === "Unknown symbol" || stock2 === "Unkown symbol") {
+          const result = [stock1];
+          result.push(stock2);
+          res.json({ stockData: result });
+        } else {
           const result = {
-          stockData: [{stock: stock1.stock, price: stock1.price, rel_likes: stock1.likes - stock2.likes},
-                      {stock: stock2.stock, price: stock2.price, rel_likes: stock2.likes - stock1.likes}]
+            stockData: [
+              {
+                stock: stock1.stock,
+                price: stock1.price,
+                rel_likes: stock1.likes - stock2.likes
+              },
+              {
+                stock: stock2.stock,
+                price: stock2.price,
+                rel_likes: stock2.likes - stock1.likes
+              }
+            ]
+          };
+          res.json(result);
         }
-        }
-        
-        
       });
     } //end of if Array
   }); //end of app.route --> .get
