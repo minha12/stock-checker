@@ -77,7 +77,9 @@ module.exports = function (app) {
       }
       const callBack = (data) => {
         console.log(data)
-        return data
+        return new Promise(waitForData => {
+          waitFor
+        }
       }
       
       if(Array.isArray(stock)){
