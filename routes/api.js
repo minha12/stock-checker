@@ -1,18 +1,26 @@
-/*
- *
- *
- *       Complete the API routing below
- *
- *
- */
-
 "use strict";
 var fetch = require("node-fetch");
 var expect = require("chai").expect;
-var MongoClient = require("mongodb");
+const { MongoClient, ServerApiVersion } = require('mongodb');
 var request = require("request");
+require('dotenv').config();
 
-const CONNECTION_STRING = process.env.DB; //MongoClient.connect(CONNECTION_STRING, function(err, db) {});
+const client = new MongoClient(process.env.DB, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
+});
+
+// Connect to MongoDB once
+let connected = false;
+async function connectDB() {
+  if (!connected) {
+    await client.connect();
+    connected = true;
+  }
+}
 
 module.exports = function(app) {
   app.route("/api/stock-prices").get(function(req, res) {
@@ -22,71 +30,57 @@ module.exports = function(app) {
     console.log(like);
     var ip = req.connection.remoteAddress;
 
-    const stockHandler = (stock, like, ip) => {
+    const stockHandler = async (stock, like, ip) => {
       return new Promise(waitForData => {
         request(
-          `https://repeated-alpaca.glitch.me/v1/stock/${stock}/quote`,
-          (error, response, body) => {
+          `https://stock-price-checker-proxy.freecodecamp.rocks/v1/stock/${stock}/quote`,
+          async (error, response, body) => {
             var result = JSON.parse(body);
             if (result === "Unknown symbol") {
-              console.log("Unkown symbol");
-              let returnData = { stockData: "Unkown symbol" };
+              let returnData = { stockData: "Unknown symbol" };
               waitForData(returnData);
             } else {
-              MongoClient.connect(CONNECTION_STRING, (err, db) => {
+              try {
+                await connectDB();
+                const collection = client.db().collection("Stocks");
+                
                 if (!like) {
-                  //check if the stock is available in db, likes remain intact
-                  console.log("Connected to MongoDB");
-                  db.collection("Stocks").findOneAndUpdate(
+                  const data = await collection.findOneAndUpdate(
                     { stock: stock },
-                    {
-                      $setOnInsert: { stock: stock, likes: [] }
-                    },
-                    {
-                      returnOriginal: false,
-                      upsert: true
-                    },
-                    (error, data) => {
-                      //console.log(data.value)
-                      var returnData = {
-                        stockData: {
-                          stock: result.symbol,
-                          price: result.latestPrice,
-                          likes: data.value.likes.length
-                        }
-                      };
-                      waitForData(returnData);
-                    }
+                    { $setOnInsert: { stock: stock, likes: [] } },
+                    { returnDocument: 'after', upsert: true }
                   );
+                  
+                  waitForData({
+                    stockData: {
+                      stock: result.symbol,
+                      price: result.latestPrice,
+                      likes: data.likes ? data.likes.length : 0
+                    }
+                  });
                 } else {
-                  //update likes
-                  db.collection("Stocks").findOneAndUpdate(
+                  const data = await collection.findOneAndUpdate(
                     { stock: stock },
-                    {
-                      $addToSet: { likes: ip }
-                    },
-                    {
-                      returnOriginal: false,
-                      upsert: true
-                    },
-                    (error, data) => {
-                      //console.log(data)
-                      var returnData = {
-                        stockData: {
-                          stock: result.symbol,
-                          price: result.latestPrice,
-                          likes: data.value.likes.length
-                        }
-                      };
-                      waitForData(returnData);
-                    }
+                    { $addToSet: { likes: ip } },
+                    { returnDocument: 'after', upsert: true }
                   );
+                  
+                  waitForData({
+                    stockData: {
+                      stock: result.symbol,
+                      price: result.latestPrice,
+                      likes: data.likes ? data.likes.length : 0
+                    }
+                  });
                 }
-              });
+              } catch (err) {
+                console.error('Database error:', err);
+                waitForData({ error: 'Error accessing database' });
+              }
             }
           }
-        ); //end of request
-      }); //end of Promise
+        );
+      });
     };
 
     if (Array.isArray(stock)) {
