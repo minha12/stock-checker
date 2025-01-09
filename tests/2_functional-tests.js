@@ -11,6 +11,9 @@ var chai = require("chai");
 var assert = chai.assert;
 var server = require("../server");
 
+var mocha = require('mocha');
+var { suite, test } = mocha;
+
 chai.use(chaiHttp);
 
 suite("Functional Tests", function() {
